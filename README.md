@@ -25,6 +25,18 @@ Licenses: see [LICENSES](./LICENSE.md).
 - Responsive layout. On small screens editor and viewer are stacked onto each other, while on larger screens they can be side-by-side
 - Installable as a PWA (then persists edits in localStorage instead of the hash fragment). On iOS just open the sharing panel and tap "Add to Home Screen". *Should not* require any internet connectivity once cached.
 
+### Camera presets in a SCAD file
+
+A model can choose the viewer camera on each render with `echo(playground_camera = [eye, target, fov]);`. Give the eye and target as XYZ points in exported model units and the field of view in degrees (10–120). For example, this Customizer dropdown switches between two viewpoints:
+
+```scad
+/* [Camera] */
+viewpoint = "Front"; // [Front, Side]
+eye = viewpoint == "Front" ? [0, -50, 10] : [50, 0, 10];
+echo(playground_camera = [eye, [0, 0, 0], 45]);
+cube(10, center=true);
+```
+
 ## Roadmap
 
 - [x] Add tests!

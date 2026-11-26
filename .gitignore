@@ -10,3 +10,4 @@ src/wasm
 .env*.local
 *.log
 public/openscad.fallback.js
+*.local.ts

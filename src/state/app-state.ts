@@ -1,6 +1,7 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
 import type { MarkerData } from '../runner/marker-types';
+import type { ResolvedCamera } from './mcp-tools-logic.ts';
 import { ParameterSet } from './customizer-types.ts';
 import { VALID_EXPORT_FORMATS_2D, VALID_EXPORT_FORMATS_3D } from './formats.ts';
 
@@ -79,6 +80,7 @@ export interface State {
   error?: string,
   is2D?: boolean,
   output?: FileOutput & {
+    camera?: ResolvedCamera,
     isPreview: boolean,
   },
   export?: FileOutput,

@@ -340,6 +340,7 @@ function ViewerPanelInner({className, style, viewerRef, disableZoom, onCameraCha
     async setCamera(r: ResolvedCamera): Promise<CameraState | null> {
       const mv = modelViewerRef.current;
       if (!mv) return null;
+      setInteractionPrompt('none');
       widenCameraLimits(mv);
       let radius: string;
       if (r.zoom === 1) {

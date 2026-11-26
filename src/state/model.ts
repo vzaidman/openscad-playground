@@ -16,6 +16,7 @@ import { exportGlb } from "../io/export_glb.ts";
 import { export3MF } from "../io/export_3mf.ts";
 import chroma from "chroma-js";
 import type { ExportFormat } from "./export-logic.ts";
+import { cameraFromRender } from './camera-presets.ts';
 
 const githubRx = /^https:\/\/github.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/;
 
@@ -531,6 +532,7 @@ export class Model {
         }
 
         s.output = {
+          camera: cameraFromRender(output.logText),
           isPreview: isPreview,
           outFile: output.outFile,
           outFileURL,

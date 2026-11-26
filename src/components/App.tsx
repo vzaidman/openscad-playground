@@ -1,6 +1,6 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {State, StatePersister} from '../state/app-state'
 import { Model } from '../state/model';
 import FullLayout from './FullLayout';
@@ -13,10 +13,27 @@ import { EmbedIcons } from './EmbedView';
 import { startBackgroundLoading } from '../background-loading';
 import { downloadSource, downloadUrl } from '../utils';
 import { buildFilename, type ExportFormat } from '../state/export-logic';
-
+import type { ViewerPanelHandle } from './ViewerPanel';
+import { selectedCameraPreset } from '../state/camera-presets.ts';
+import { presetOrbit, type ResolvedCamera } from '../state/mcp-tools-logic.ts';
 
 export function App({initialState, statePersister, fs}: {initialState: State, statePersister: StatePersister, fs: FS}) {
   const [state, setState] = useState(initialState);
+  const viewerRef = useRef<ViewerPanelHandle>(null);
+  const preset = selectedCameraPreset(state.parameterSet, state.params.vars);
+  const renderCamera = state.output?.camera;
+  const displayURL = state.output?.displayFileURL;
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    const camera: ResolvedCamera | undefined = renderCamera ?? (preset
+      ? { ...presetOrbit(preset), zoom: 1, target: 'auto', fov: 'auto' } : undefined);
+    if (!displayURL || !viewer || !camera) return;
+    let cancelled = false;
+    void viewer.waitForModel(20_000).then(ready => {
+      if (ready && !cancelled) return viewer.setCamera(camera);
+    }).catch(error => console.warn('Could not apply the selected camera preset', error));
+    return () => { cancelled = true; };
+  }, [preset, renderCamera, displayURL, state.view.embed]);
   
   const model = new Model(fs, state, setState, statePersister);
   useEffect(() => model.init());
@@ -76,7 +93,7 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
       <FSContext.Provider value={fs}>
         {state.view.embed
           ? <EmbedView
-              viewerRef={null}
+              viewerRef={viewerRef}
               isDark={isDark}
               fullscreen={fullscreen}
               onDownload={onDownload}
@@ -86,7 +103,7 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
               exit={isFramed()
                 ? { label: 'Open full app in a new tab', icon: EmbedIcons.externalLink, href: () => fullAppUrl(window.location.href) }
                 : { label: 'Exit embed mode (full app)', icon: EmbedIcons.layout, onClick: () => model.mutate(s => { s.view.embed = false; s.view.customizerOverlay = false; }) }} />
-          : <FullLayout />}
+          : <FullLayout viewerRef={viewerRef} />}
       </FSContext.Provider>
     </ModelContext.Provider>
   );
