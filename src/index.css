@@ -12,3 +12,40 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.native-resizable-panel {
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  resize: horizontal;
+  border-inline-end: 1px solid var(--surface-200, #e5e7eb);
+  padding-bottom: 14px;
+}
+
+/* The browser puts its resize grip on the inline end. */
+.resize-edge-left {
+  direction: rtl;
+}
+
+.resize-edge-left > * {
+  direction: ltr;
+}
+
+.panel-grip-focus {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.resize-edge-left > .panel-grip-focus {
+  right: auto;
+  left: 0;
+}
+
+.panel-grip-focus:focus-visible {
+  outline: 2px solid var(--primary-color, #6366f1);
+  outline-offset: -2px;
+}
